@@ -1,5 +1,5 @@
 import React from 'react';
-import { Center, Environment, OrbitControls } from '@react-three/drei';
+import { Center, DragControls, Environment, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bedroom } from './components/Bedroom';
 import { Adult, Pet } from './components/Pet';
@@ -22,9 +22,9 @@ const Experience = () => {
         />
         <Center>
           <Bedroom scale={0.6} rotation-y={-Math.PI / 2} />
-          <PivotControls depthTest={false}>
+          <DragControls>
             <Pet scale={2} position={[-0.6, 0.1, 0]} />
-          </PivotControls>
+          </DragControls>
         </Center>
       </Canvas>
     </>

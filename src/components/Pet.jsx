@@ -7,7 +7,7 @@ import { useFrame } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
 import DraggableRigidBody from './controls/DraggableRigidBody';
 
-const DraggableRigidBodyProps = {
+export const DraggableRigidBodyProps = {
   rigidBodyProps: {
     gravityScale: 3.5,
     linearDamping: 5,

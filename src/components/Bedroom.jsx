@@ -1,56 +1,57 @@
 import React, { useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { CuboidCollider, MeshCollider, RigidBody } from '@react-three/rapier';
+import { CuboidCollider, RigidBody } from '@react-three/rapier';
 
 export function Bedroom(props) {
   const { nodes, materials } = useGLTF('/assets/models/bedroom.glb');
   return (
     <group {...props} dispose={null}>
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Bed_frame.geometry}
-        material={materials.Frame}
-        position={[-2.66, 0.203, 2.206]}
-      />
+      <RigidBody type="fixed" position={[-2.66, 0.203, 2.206]} colliders="trimesh">
+        <mesh castShadow receiveShadow geometry={nodes.Bed_frame.geometry} material={materials.Frame} />
+      </RigidBody>
       {/* Bed */}
-      <group position={[-2.66, 0.875, 2.206]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube011.geometry} material={materials.White} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube011_1.geometry} material={materials.Pillow} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube011_2.geometry} material={materials.Blanket} />
-      </group>
+      <RigidBody type="fixed" position={[-2.66, 0.875, 2.206]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube011.geometry} material={materials.White} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube011_1.geometry} material={materials.Pillow} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube011_2.geometry} material={materials.Blanket} />
+        </group>
+      </RigidBody>
       {/* Pillow on bed */}
-      <group position={[-2.66, 1.337, 3.599]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube012.geometry} material={materials.Blanket} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube012_1.geometry} material={materials.Pillow} />
-      </group>
+      <RigidBody type="fixed" position={[-2.66, 1.337, 3.599]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube012.geometry} material={materials.Blanket} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube012_1.geometry} material={materials.Pillow} />
+        </group>
+      </RigidBody>
       {/* Sofa under the window */}
-      <group position={[-0.007, 0.204, 3.486]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube008.geometry} material={materials.Frame} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube008_1.geometry} material={materials.Blanket} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube008_2.geometry} material={materials['Pin picture.001']} />
-      </group>
+      <RigidBody type="fixed" position={[-0.007, 0.204, 3.486]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube008.geometry} material={materials.Frame} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube008_1.geometry} material={materials.Blanket} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube008_2.geometry} material={materials['Pin picture.001']} />
+        </group>
+      </RigidBody>
       {/* Pillows */}
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Pillow001.geometry}
-        material={materials.Pillow}
-        position={[0.153, 1.239, 3.649]}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Pillow002.geometry}
-        material={materials.Pillow}
-        position={[0.59, 1.285, 3.771]}
-        rotation={[-1.18, 0.143, 0.13]}
-      />
+      <RigidBody type="dynamic" position={[0.153, 1.239, 3.649]}>
+        <mesh castShadow receiveShadow geometry={nodes.Pillow001.geometry} material={materials.Pillow} />
+      </RigidBody>
+      <RigidBody type="dynamic" position={[0.59, 1.285, 3.771]}>
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.Pillow002.geometry}
+          material={materials.Pillow}
+          rotation={[-1.18, 0.143, 0.13]}
+        />
+      </RigidBody>
       {/* Library */}
-      <group position={[2.63, 0.204, 3.657]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube016.geometry} material={materials.Frame} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube016_1.geometry} material={materials['Pin picture.001']} />
-      </group>
+      <RigidBody type="fixed" position={[2.63, 0.204, 3.657]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube016.geometry} material={materials.Frame} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube016_1.geometry} material={materials['Pin picture.001']} />
+        </group>
+      </RigidBody>
       {/* Books */}
       <group position={[3.378, 1.88, 3.675]}>
         <mesh castShadow receiveShadow geometry={nodes.Cube020.geometry} material={materials.White} />
@@ -89,80 +90,94 @@ export function Bedroom(props) {
       </group>
 
       {/* Desk */}
-      <group position={[-3.23, 0.198, -1.541]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube017.geometry} material={materials.Frame} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube017_1.geometry} material={materials['Pin picture.001']} />
-      </group>
+      <RigidBody type="fixed" position={[-3.23, 0.198, -1.541]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube017.geometry} material={materials.Frame} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube017_1.geometry} material={materials['Pin picture.001']} />
+        </group>
+      </RigidBody>
 
       {/* Coffe table */}
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Coffe_table.geometry}
-        material={materials.Frame}
-        position={[1.197, 0.554, -0.881]}
-      />
+      <RigidBody type="dynamic" position={[1.197, 0.554, -0.881]}>
+        <mesh castShadow receiveShadow geometry={nodes.Coffe_table.geometry} material={materials.Frame} />
+      </RigidBody>
       {/* Coffee */}
-      <group position={[1.687, 0.667, -0.803]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder005.geometry} material={materials.White} />
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder005_1.geometry} material={materials.Coffe} />
-      </group>
-      <group position={[1.306, 0.684, -1.454]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder006.geometry} material={materials.White} />
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder006_1.geometry} material={materials.Coffe} />
-      </group>
+      <RigidBody type="dynamic" position={[1.687, 0.667, -0.803]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder005.geometry} material={materials.White} />
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder005_1.geometry} material={materials.Coffe} />
+        </group>
+      </RigidBody>
+      <RigidBody type="dynamic" position={[1.306, 0.684, -1.454]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder006.geometry} material={materials.White} />
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder006_1.geometry} material={materials.Coffe} />
+        </group>
+      </RigidBody>
       {/* Carpet */}
       <group position={[1.186, 0.208, -0.871]} rotation={[0, 0.455, 0]}>
         <mesh castShadow receiveShadow geometry={nodes.Plane.geometry} material={materials.Pillow} />
         <mesh castShadow receiveShadow geometry={nodes.Plane_1.geometry} material={materials.White} />
       </group>
       {/* Cushion */}
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Cushion.geometry}
-        material={materials.Blanket}
-        position={[2.772, 0.282, -0.848]}
-        rotation={[0, 0.349, 0]}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Cushion001.geometry}
-        material={materials.Blanket}
-        position={[1.416, 0.282, -2.391]}
-        rotation={[-Math.PI, 1.403, -Math.PI]}
-      />
+      <RigidBody type="dynamic" position={[2.772, 0.282, -0.848]}>
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.Cushion.geometry}
+          material={materials.Blanket}
+          rotation={[0, 0.349, 0]}
+        />
+      </RigidBody>
+      <RigidBody type="dynamic" position={[1.416, 0.282, -2.391]}>
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.Cushion001.geometry}
+          material={materials.Blanket}
+          rotation={[-Math.PI, 1.403, -Math.PI]}
+        />
+      </RigidBody>
 
       {/* Bin */}
-      <group position={[-3.568, 0.174, -3.313]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube035.geometry} material={materials.Blanket} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube035_1.geometry} material={materials.Pillow} />
-      </group>
+      <RigidBody type="dynamic" position={[-3.568, 0.174, -3.313]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube035.geometry} material={materials.Blanket} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube035_1.geometry} material={materials.Pillow} />
+        </group>
+      </RigidBody>
 
       {/* Chair */}
-      <group position={[-1.738, 1.057, -1.254]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube052.geometry} material={materials.Blanket} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube052_1.geometry} material={materials.Frame} />
-      </group>
+      <RigidBody type="dynamic" position={[-1.738, 1.057, -1.254]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube052.geometry} material={materials.Blanket} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube052_1.geometry} material={materials.Frame} />
+        </group>
+      </RigidBody>
 
       {/* Screen */}
-      <group position={[-3.654, 1.444, -1.056]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube021.geometry} material={materials.Pillow} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube021_1.geometry} material={materials['Pin picture.001']} />
-      </group>
+      <RigidBody type="dynamic" position={[-3.654, 1.444, -1.056]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube021.geometry} material={materials.Pillow} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube021_1.geometry} material={materials['Pin picture.001']} />
+        </group>
+      </RigidBody>
       {/* Keyboard */}
-      <group position={[-2.953, 1.441, -1.105]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cube023.geometry} material={materials.Pillow} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube023_1.geometry} material={materials['Pin picture.001']} />
-      </group>
+      <RigidBody type="dynamic" position={[-2.953, 1.441, -1.105]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cube023.geometry} material={materials.Pillow} />
+          <mesh castShadow receiveShadow geometry={nodes.Cube023_1.geometry} material={materials['Pin picture.001']} />
+        </group>
+      </RigidBody>
       {/* Plant */}
-      <group position={[-3.659, 1.445, -2.442]}>
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder.geometry} material={materials.Coffe} />
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder_1.geometry} material={materials.Blanket} />
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder_2.geometry} material={materials.Leaves} />
-        <mesh castShadow receiveShadow geometry={nodes.Cylinder_3.geometry} material={materials.Frame} />
-      </group>
+      <RigidBody type="dynamic" position={[-3.659, 1.445, -2.442]}>
+        <group>
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder.geometry} material={materials.Coffe} />
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder_1.geometry} material={materials.Blanket} />
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder_2.geometry} material={materials.Leaves} />
+          <mesh castShadow receiveShadow geometry={nodes.Cylinder_3.geometry} material={materials.Frame} />
+        </group>
+      </RigidBody>
 
       {/* Window */}
       <group position={[0.038, 2.932, 4.276]}>

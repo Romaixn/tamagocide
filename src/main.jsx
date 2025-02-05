@@ -10,6 +10,6 @@ const isProd = process.env.NODE_ENV === 'production';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Experience />
-    <Leva hidden={isProd} collapsed={true} />
+    <Leva hidden={isProd} />
   </React.StrictMode>,
 );

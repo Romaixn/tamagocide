@@ -4,38 +4,67 @@ import { useGLTF } from '@react-three/drei';
 import { useEffect } from 'react';
 import { WiggleBone } from 'wiggle';
 import { useFrame } from '@react-three/fiber';
+import { RigidBody } from '@react-three/rapier';
+import DraggableRigidBody from './controls/DraggableRigidBody';
+
+const DraggableRigidBodyProps = {
+  rigidBodyProps: {
+    gravityScale: 3.5,
+    linearDamping: 5,
+    angularDamping: 0.2,
+  },
+  boundingBox: [
+    [-2.8, 2.8],
+    [0.5, 2],
+    [-2.8, 2.8],
+  ],
+  dragControlsProps: {
+    preventOverlap: true,
+  },
+};
 
 export function Pet(props) {
-  const { nodes, scene } = useGLTF('/assets/models/pet.glb');
-  const wiggleBones = useRef([]);
+  const { nodes, scene, materials } = useGLTF('/assets/models/pet.glb');
+    const wiggleBones = useRef([]);
 
-  useEffect(() => {
-    wiggleBones.current.length = 0;
-    nodes.RootBone.traverse((bone) => {
-      if (bone.isBone && bone !== nodes.RootBone) {
-        const wiggleBone = new WiggleBone(bone, {
-          velocity: 0.2,
-        });
+    useEffect(() => {
+      wiggleBones.current.length = 0;
+      nodes.RootBone.traverse((bone) => {
+        if (bone.isBone && bone !== nodes.RootBone) {
+          const wiggleBone = new WiggleBone(bone, {
+            velocity: 0.2,
+          });
 
-        wiggleBones.current.push(wiggleBone);
-      }
-    });
-
-    return () => {
-      wiggleBones.current.forEach((wiggleBone) => {
-        wiggleBone.reset();
-        wiggleBone.dispose();
+          wiggleBones.current.push(wiggleBone);
+        }
       });
-    };
-  }, [nodes]);
 
-  useFrame(() => {
-    wiggleBones.current.forEach((wiggleBone) => {
-      wiggleBone.update();
+      return () => {
+        wiggleBones.current.forEach((wiggleBone) => {
+          wiggleBone.reset();
+          wiggleBone.dispose();
+        });
+      };
+    }, [nodes]);
+
+    useFrame(() => {
+      wiggleBones.current.forEach((wiggleBone) => {
+        wiggleBone.update();
+      });
     });
-  });
 
-  return <primitive object={scene} scale={0.6} />;
+  //   return <primitive object={scene} scale={0.6} />;
+  return (
+    <DraggableRigidBody
+      {...DraggableRigidBodyProps}
+      visibleMesh={
+        <group {...props} dispose={null}>
+          <skinnedMesh geometry={nodes.Pet.geometry} material={nodes.Pet.material} skeleton={nodes.Pet.skeleton} />
+          <primitive object={nodes.RootBone} />
+        </group>
+      }
+    />
+  );
 }
 
 useGLTF.preload('/assets/models/pet.glb');

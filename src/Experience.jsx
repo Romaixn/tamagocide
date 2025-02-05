@@ -37,7 +37,7 @@ const Experience = () => {
         <Physics timeStep="vary" debug={!isProd}>
           <Center>
             <Bedroom scale={0.6} rotation-y={-Math.PI / 2} />
-            <Pet scale={0.5} position={[0, 2, 0]} />
+            <Pet scale={0.5} />
           </Center>
         </Physics>
       </Canvas>

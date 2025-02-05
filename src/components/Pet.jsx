@@ -14,9 +14,9 @@ const DraggableRigidBodyProps = {
     angularDamping: 0.2,
   },
   boundingBox: [
-    [-2.8, 2.8],
-    [0.5, 2],
-    [-2.8, 2.8],
+    [-2, 2.5],
+    [-1.5, 1],
+    [-2, 2.5],
   ],
   dragControlsProps: {
     preventOverlap: true,

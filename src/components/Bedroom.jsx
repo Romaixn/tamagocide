@@ -199,13 +199,9 @@ export function Bedroom(props) {
       </group>
 
       {/* Wallshelf */}
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Wallshelf.geometry}
-        material={materials.Frame}
-        position={[-3.77, 3.25, 2.269]}
-      />
+      <RigidBody type="fixed" position={[-3.77, 3.25, 2.269]}>
+        <mesh castShadow receiveShadow geometry={nodes.Wallshelf.geometry} material={materials.Frame} />
+      </RigidBody>
       {/* Plants */}
       <group position={[-3.717, 3.193, 2.867]}>
         <mesh castShadow receiveShadow geometry={nodes.Cylinder001.geometry} material={materials.Red} />

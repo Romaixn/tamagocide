@@ -15,7 +15,7 @@ const DraggableRigidBodyProps = {
   },
   boundingBox: [
     [-2, 2.5],
-    [-1.4, 1],
+    [-1.5, 1],
     [-2, 2.5],
   ],
   dragControlsProps: {

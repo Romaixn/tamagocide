@@ -8,7 +8,7 @@ export const DEFAULT_SPRING_JOINT_CONFIG = {
   restLength: 0,
   stiffness: 500,
   damping: 0,
-  collisionGroups: 2
+  collisionGroups: 2,
 };
 
 const DraggableRigidBody = forwardRef((props, ref) => {
@@ -21,39 +21,39 @@ const DraggableRigidBody = forwardRef((props, ref) => {
   const meshRef = useRef(null);
   const invisibleDragControlsMeshRef = useRef(null);
 
+  const reset = () => {
+    rigidBodyRef.current.setTranslation({ x: 0, y: 0, z: 0 });
+    rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 });
+    rigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 });
+  };
+
   useImperativeHandle(ref, () => ({
     getInvisibleMesh: () => invisibleDragControlsMeshRef.current,
     getVisibleMesh: () => meshRef.current,
   }));
 
-  useSpringJoint(
-    jointRigidBodyRef,
-    rigidBodyRef,
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      props.jointConfig?.restLength ?? DEFAULT_SPRING_JOINT_CONFIG.restLength,
-      props.jointConfig?.stiffness ?? DEFAULT_SPRING_JOINT_CONFIG.stiffness,
-      props.jointConfig?.damping ?? DEFAULT_SPRING_JOINT_CONFIG.damping,
-    ]
-  );
+  useSpringJoint(jointRigidBodyRef, rigidBodyRef, [
+    [0, 0, 0],
+    [0, 0, 0],
+    props.jointConfig?.restLength ?? DEFAULT_SPRING_JOINT_CONFIG.restLength,
+    props.jointConfig?.stiffness ?? DEFAULT_SPRING_JOINT_CONFIG.stiffness,
+    props.jointConfig?.damping ?? DEFAULT_SPRING_JOINT_CONFIG.damping,
+  ]);
 
   useFrame(() => {
-    if (
-      jointRigidBodyRef.current &&
-      !jointRigidBodyRef.current.isSleeping() &&
-      !isDragging
-    ) {
+    if (jointRigidBodyRef.current && !jointRigidBodyRef.current.isSleeping() && !isDragging) {
       jointRigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, false);
       jointRigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 }, false);
     }
 
     if (
-      !invisibleDragControlsMeshRef.current || !meshRef.current ||
+      !invisibleDragControlsMeshRef.current ||
+      !meshRef.current ||
       isDragging ||
       rigidBodyRef.current?.bodyType() === 2 ||
       rigidBodyRef.current?.isSleeping()
-    ) return;
+    )
+      return;
 
     const pmV = meshRef.current?.parent;
     const pmI = invisibleDragControlsMeshRef.current?.parent;
@@ -69,6 +69,14 @@ const DraggableRigidBody = forwardRef((props, ref) => {
 
     pmV.attach(meshRef.current);
     pmI.attach(invisibleDragControlsMeshRef.current);
+
+    if (!props.resetPositionOnFall || !rigidBodyRef.current) return;
+
+    const bodyPosition = rigidBodyRef.current.translation();
+
+    if (bodyPosition.y < -4) {
+      reset();
+    }
   });
 
   const getBoxedPosition = (position) => {
@@ -137,9 +145,13 @@ const DraggableRigidBody = forwardRef((props, ref) => {
   return (
     <group {...props.groupProps}>
       {props.enableSpringJoint && (
-        <RigidBody type={'dynamic'} ref={jointRigidBodyRef} collisionGroups={props.jointConfig?.springJointCollisionGroups ?? DEFAULT_SPRING_JOINT_CONFIG.collisionGroups}>
+        <RigidBody
+          type={'dynamic'}
+          ref={jointRigidBodyRef}
+          collisionGroups={props.jointConfig?.springJointCollisionGroups ?? DEFAULT_SPRING_JOINT_CONFIG.collisionGroups}
+        >
           <mesh>
-            <boxGeometry args={[.01, .01, .01]} />
+            <boxGeometry args={[0.01, 0.01, 0.01]} />
             <meshStandardMaterial visible={false} />
           </mesh>
         </RigidBody>
@@ -151,15 +163,14 @@ const DraggableRigidBody = forwardRef((props, ref) => {
         onDragEnd={stopDragging}
         {...props.dragControlsProps}
       >
-        {React.cloneElement(props.invisibleMesh ?? props.visibleMesh, { ref: invisibleDragControlsMeshRef, key: 'invisible', visible: false })}
+        {React.cloneElement(props.invisibleMesh ?? props.visibleMesh, {
+          ref: invisibleDragControlsMeshRef,
+          key: 'invisible',
+          visible: false,
+        })}
       </CustomDragControls>
 
-      <RigidBody
-        ref={rigidBodyRef}
-        type={'dynamic'}
-        colliders={'hull'}
-        {...props.rigidBodyProps}
-      >
+      <RigidBody ref={rigidBodyRef} type={'dynamic'} colliders={'hull'} {...props.rigidBodyProps}>
         {React.cloneElement(props.visibleMesh, { ref: meshRef, key: 'visible' })}
       </RigidBody>
     </group>

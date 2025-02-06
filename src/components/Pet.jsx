@@ -4,10 +4,9 @@ import { useGLTF } from '@react-three/drei';
 import { useEffect } from 'react';
 import { WiggleBone } from 'wiggle';
 import { useFrame } from '@react-three/fiber';
-import { RigidBody } from '@react-three/rapier';
 import DraggableRigidBody from './controls/DraggableRigidBody';
 
-export const DraggableRigidBodyProps = {
+const DraggableRigidBodyProps = {
   rigidBodyProps: {
     gravityScale: 3.5,
     linearDamping: 5,
@@ -21,37 +20,38 @@ export const DraggableRigidBodyProps = {
   dragControlsProps: {
     preventOverlap: true,
   },
+  resetPositionOnFall: true,
 };
 
 export function Pet(props) {
   const { nodes, scene, materials } = useGLTF('/assets/models/pet.glb');
-    const wiggleBones = useRef([]);
+  const wiggleBones = useRef([]);
 
-    useEffect(() => {
-      wiggleBones.current.length = 0;
-      nodes.RootBone.traverse((bone) => {
-        if (bone.isBone && bone !== nodes.RootBone) {
-          const wiggleBone = new WiggleBone(bone, {
-            velocity: 0.2,
-          });
-
-          wiggleBones.current.push(wiggleBone);
-        }
-      });
-
-      return () => {
-        wiggleBones.current.forEach((wiggleBone) => {
-          wiggleBone.reset();
-          wiggleBone.dispose();
+  useEffect(() => {
+    wiggleBones.current.length = 0;
+    nodes.RootBone.traverse((bone) => {
+      if (bone.isBone && bone !== nodes.RootBone) {
+        const wiggleBone = new WiggleBone(bone, {
+          velocity: 0.2,
         });
-      };
-    }, [nodes]);
 
-    useFrame(() => {
-      wiggleBones.current.forEach((wiggleBone) => {
-        wiggleBone.update();
-      });
+        wiggleBones.current.push(wiggleBone);
+      }
     });
+
+    return () => {
+      wiggleBones.current.forEach((wiggleBone) => {
+        wiggleBone.reset();
+        wiggleBone.dispose();
+      });
+    };
+  }, [nodes]);
+
+  useFrame(() => {
+    wiggleBones.current.forEach((wiggleBone) => {
+      wiggleBone.update();
+    });
+  });
 
   //   return <primitive object={scene} scale={0.6} />;
   return (

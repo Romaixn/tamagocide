@@ -1,12 +1,12 @@
 import React from 'react';
-import { CameraControls, Center, DragControls, Environment } from '@react-three/drei';
+import { CameraControls, Center, Environment } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bedroom } from './components/Bedroom';
 import { Pet } from './components/Pet';
 import { Perf } from 'r3f-perf';
-import { Physics, RigidBody } from '@react-three/rapier';
+import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
-import DraggableRigidBody from './components/controls/DraggableRigidBody';
+import { FoodSpawner } from './components/Foods';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -17,6 +17,10 @@ const Experience = () => {
     minAzimuthAngle: { value: -Math.PI / 4, min: -Math.PI / 2, max: 0 },
     maxAzimuthAngle: { value: Math.PI / 1.5, min: Math.PI / 2, max: Math.PI },
     maxPolarAngle: { value: Math.PI / 2, min: Math.PI / 4, max: Math.PI },
+  });
+
+  const { spawnAreaSize } = useControls('Spawning', {
+    spawnAreaSize: { value: 2.8, min: 1, max: 20 },
   });
 
   return (
@@ -38,6 +42,7 @@ const Experience = () => {
           <Center>
             <Bedroom scale={0.6} rotation-y={-Math.PI / 2} />
             <Pet scale={0.5} />
+            <FoodSpawner spawnAreaSize={spawnAreaSize} />
           </Center>
         </Physics>
       </Canvas>

@@ -19,11 +19,7 @@ function shuffle(array) {
   return array;
 }
 
-export const FoodSpawner = ({ spawnAreaSize }) => {
-  const { spawnInterval } = useControls('Spawning', {
-    spawnInterval: { value: 10000, min: 1000, max: 60000, step: 1000 },
-  });
-
+export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
   const [foodItems, setFoodItems] = useState([]);
 
   useEffect(() => {

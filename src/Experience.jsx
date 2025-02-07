@@ -19,8 +19,9 @@ const Experience = () => {
     maxPolarAngle: { value: Math.PI / 2, min: Math.PI / 4, max: Math.PI },
   });
 
-  const { spawnAreaSize } = useControls('Spawning', {
+  const { spawnAreaSize, spawnInterval } = useControls('Spawning', {
     spawnAreaSize: { value: 2.8, min: 1, max: 20 },
+    spawnInterval: { value: 10000, min: 1000, max: 60000, step: 1000 },
   });
 
   return (
@@ -42,7 +43,7 @@ const Experience = () => {
           <Center>
             <Bedroom scale={0.6} rotation-y={-Math.PI / 2} />
             <Pet scale={0.5} />
-            <FoodSpawner spawnAreaSize={spawnAreaSize} />
+            <FoodSpawner spawnAreaSize={spawnAreaSize} spawnInterval={spawnInterval} />
           </Center>
         </Physics>
       </Canvas>

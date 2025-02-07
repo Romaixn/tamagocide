@@ -7,6 +7,7 @@ import { Perf } from 'r3f-perf';
 import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { FoodSpawner } from './components/Foods';
+import { ToySpawner } from './components/Toys';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -19,9 +20,10 @@ const Experience = () => {
     maxPolarAngle: { value: Math.PI / 2, min: Math.PI / 4, max: Math.PI },
   });
 
-  const { spawnAreaSize, spawnInterval } = useControls('Spawning', {
+  const { spawnAreaSize, foodSpawnInterval, toySpawnInterval } = useControls('Spawning', {
     spawnAreaSize: { value: 2.8, min: 1, max: 20 },
-    spawnInterval: { value: 10000, min: 1000, max: 60000, step: 1000 },
+    foodSpawnInterval: { value: 10000, min: 1000, max: 60000, step: 1000 },
+    toySpawnInterval: { value: 30000, min: 1000, max: 60000, step: 1000 },
   });
 
   return (
@@ -43,7 +45,8 @@ const Experience = () => {
           <Center>
             <Bedroom scale={0.6} rotation-y={-Math.PI / 2} />
             <Pet scale={0.5} />
-            <FoodSpawner spawnAreaSize={spawnAreaSize} spawnInterval={spawnInterval} />
+            <FoodSpawner spawnAreaSize={spawnAreaSize} spawnInterval={foodSpawnInterval} />
+            <ToySpawner spawnAreaSize={spawnAreaSize} spawnInterval={toySpawnInterval} />
           </Center>
         </Physics>
       </Canvas>

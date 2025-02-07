@@ -2,22 +2,12 @@ import React from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
-import { useMemo } from 'react';
-import { useControls } from 'leva';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
 export const GoodFood = [Apple, Broccoli, Carrot, Eggplant, Ham, Meat, Pineapple, Tomato];
 
 export const BadFood = [Burger, Croissant, Donut, Fries, HotDog, Pizza, Soda, Sundae, Taco, Wine];
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
 
 export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
   const [foodItems, setFoodItems] = useState([]);

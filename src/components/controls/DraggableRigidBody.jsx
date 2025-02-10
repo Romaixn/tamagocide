@@ -3,6 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { RapierRigidBody, RigidBody, useSpringJoint } from '@react-three/rapier';
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { CustomDragControls } from './CustomDragControls';
+import { useEffect } from 'react';
 
 export const DEFAULT_SPRING_JOINT_CONFIG = {
   restLength: 0,
@@ -13,6 +14,7 @@ export const DEFAULT_SPRING_JOINT_CONFIG = {
 
 const DraggableRigidBody = forwardRef((props, ref) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { scene } = useThree();
 
   const rigidBodyRef = useRef(null);
@@ -26,6 +28,11 @@ const DraggableRigidBody = forwardRef((props, ref) => {
     rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 });
     rigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 });
   };
+
+  useEffect(() => {
+    if (isDragging) return;
+    document.body.style.cursor = isHovered ? 'grabbing' : 'auto';
+  }, [isHovered, isDragging]);
 
   useImperativeHandle(ref, () => ({
     getInvisibleMesh: () => invisibleDragControlsMeshRef.current,
@@ -171,7 +178,12 @@ const DraggableRigidBody = forwardRef((props, ref) => {
       </CustomDragControls>
 
       <RigidBody ref={rigidBodyRef} type={'dynamic'} colliders={'hull'} {...props.rigidBodyProps}>
-        {React.cloneElement(props.visibleMesh, { ref: meshRef, key: 'visible' })}
+        {React.cloneElement(props.visibleMesh, {
+          ref: meshRef,
+          key: 'visible',
+          onPointerOver: () => setIsHovered(true),
+          onPointerOut: () => setIsHovered(false),
+        })}
       </RigidBody>
     </group>
   );

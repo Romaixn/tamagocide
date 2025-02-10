@@ -37,6 +37,7 @@ const DraggableRigidBody = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     getInvisibleMesh: () => invisibleDragControlsMeshRef.current,
     getVisibleMesh: () => meshRef.current,
+    getRigidBody: () => rigidBodyRef.current,
   }));
 
   useSpringJoint(jointRigidBodyRef, rigidBodyRef, [

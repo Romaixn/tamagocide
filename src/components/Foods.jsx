@@ -40,6 +40,7 @@ export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
 
   const handleFoodClick = (key) => {
     setFoodItems((prevItems) => prevItems.filter((item) => item.key !== key));
+    document.body.style.cursor = 'auto';
   };
 
   return (

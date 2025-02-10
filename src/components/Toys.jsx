@@ -37,6 +37,7 @@ export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
 
   const handleToyClick = (key) => {
     setToyItems((prevItems) => prevItems.filter((item) => item.key !== key));
+    document.body.style.cursor = 'auto';
   };
 
   return (

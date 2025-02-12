@@ -4,11 +4,12 @@ import { useGLTF } from '@react-three/drei';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { RigidBody } from '@react-three/rapier';
+import { useToyStore } from '../stores/useProps';
 
 export const Toys = [Duck, Gun, Laptop, Monkey, Radio, Skateboard, Television, VirtualPet];
 
 export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
-  const [toyItems, setToyItems] = useState([]);
+  const { toyItems, addToy, removeToy } = useToyStore();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -26,24 +27,33 @@ export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
         Math.random() * Math.PI * 2,
       );
 
-      setToyItems((prevItems) => [
-        ...prevItems,
-        { component: randomToy, position: newPosition, rotation: newRotation, key: Date.now() },
-      ]);
+      addToy({
+        component: randomToy,
+        position: newPosition,
+        rotation: newRotation,
+        key: Date.now(),
+        rigidBodyRef: React.createRef(),
+      });
     }, spawnInterval);
 
     return () => clearInterval(intervalId);
   }, [spawnInterval, spawnAreaSize]);
 
   const handleToyClick = (key) => {
-    setToyItems((prevItems) => prevItems.filter((item) => item.key !== key));
+    removeToy(key);
     document.body.style.cursor = 'auto';
   };
 
   return (
     <>
-      {toyItems.map(({ component: ToyComponent, position, rotation, key }) => (
-        <ToyComponent key={key} position={position} rotation={rotation} onClick={() => handleToyClick(key)} />
+      {toyItems.map(({ component: ToyComponent, position, rotation, key, rigidBodyRef }) => (
+        <ToyComponent
+          key={key}
+          position={position}
+          rotation={rotation}
+          onClick={() => handleToyClick(key)}
+          userData={{ isToy: true, key }}
+        />
       ))}
     </>
   );

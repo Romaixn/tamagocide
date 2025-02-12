@@ -6,6 +6,9 @@ import { WiggleBone } from 'wiggle';
 import { useFrame } from '@react-three/fiber';
 import DraggableRigidBody from './controls/DraggableRigidBody';
 import { useState } from 'react';
+import { useRapier } from '@react-three/rapier';
+import { useStatsStore } from '../stores/useStats';
+import { useFoodStore, useToyStore } from '../stores/useProps';
 
 const DraggableRigidBodyProps = {
   rigidBodyProps: {
@@ -30,6 +33,11 @@ export function Pet(props) {
   const petRigidBodyRef = useRef(null);
   const [isJumping, setIsJumping] = useState(false);
   const [jumpTarget, setJumpTarget] = useState(new THREE.Vector3());
+
+  const incrementStat = useStatsStore((state) => state.incrementStat);
+  const decrementStat = useStatsStore((state) => state.decrementStat);
+  const { toyItems, removeToy } = useToyStore();
+  const { foodItems, removeFood } = useFoodStore();
 
   useEffect(() => {
     wiggleBones.current.length = 0;
@@ -90,6 +98,22 @@ export function Pet(props) {
     }, 800);
   };
 
+  const handleCollision = (event) => {
+    const collider = event.collider;
+    const toy = collider?._parent.userData?.isToy ?? false;
+    const food = collider?._parent.userData?.isFood ?? false;
+
+    if (toy) {
+      const toyItem = toyItems.find((item) => item.key === collider._parent.userData.key);
+      removeToy(toyItem.key);
+      incrementStat('happy', 10);
+    } else if (food) {
+      const foodItem = foodItems.find((item) => item.key === collider._parent.userData.key);
+      removeFood(foodItem.key);
+      incrementStat('hungry', 20);
+    }
+  };
+
   return (
     <DraggableRigidBody
       {...DraggableRigidBodyProps}
@@ -100,6 +124,7 @@ export function Pet(props) {
         </group>
       }
       ref={petRigidBodyRef}
+      onCollisionEnter={handleCollision}
     />
   );
 }

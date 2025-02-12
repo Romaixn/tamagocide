@@ -4,13 +4,14 @@ import { useGLTF } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { useFoodStore } from '../stores/useProps';
 
 export const GoodFood = [Apple, Broccoli, Carrot, Eggplant, Ham, Meat, Pineapple, Tomato];
 
 export const BadFood = [Burger, Croissant, Donut, Fries, HotDog, Pizza, Soda, Sundae, Taco, Wine];
 
 export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
-  const [foodItems, setFoodItems] = useState([]);
+  const { foodItems, addFood, removeFood } = useFoodStore();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -29,24 +30,33 @@ export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
         Math.random() * Math.PI * 2,
       );
 
-      setFoodItems((prevItems) => [
-        ...prevItems,
-        { component: randomFood, position: newPosition, rotation: newRotation, key: Date.now() },
-      ]);
+      addFood({
+        component: randomFood,
+        position: newPosition,
+        rotation: newRotation,
+        key: Date.now(),
+      });
     }, spawnInterval);
 
     return () => clearInterval(intervalId);
   }, [spawnInterval, spawnAreaSize]);
 
   const handleFoodClick = (key) => {
-    setFoodItems((prevItems) => prevItems.filter((item) => item.key !== key));
+    removeFood(key);
     document.body.style.cursor = 'auto';
   };
 
   return (
     <>
       {foodItems.map(({ component: FoodComponent, position, rotation, key }) => (
-        <FoodComponent key={key} position={position} rotation={rotation} onClick={() => handleFoodClick(key)} />
+        <FoodComponent
+          key={key}
+          position={position}
+          rotation={rotation}
+          onClick={() => handleFoodClick(key)}
+          removeFood={() => removeFood(key)}
+          userData={{ isFood: true, key }}
+        />
       ))}
     </>
   );

@@ -178,7 +178,22 @@ const DraggableRigidBody = forwardRef((props, ref) => {
         })}
       </CustomDragControls>
 
-      <RigidBody ref={rigidBodyRef} type={'dynamic'} colliders={'hull'} {...props.rigidBodyProps}>
+      <RigidBody
+        ref={rigidBodyRef}
+        type={'dynamic'}
+        colliders={'hull'}
+        {...props.rigidBodyProps}
+        onCollisionEnter={(event) => {
+          if (props.onCollisionEnter) {
+            props.onCollisionEnter(event);
+          }
+        }}
+        onCollisionExit={(event) => {
+          if (props.onCollisionExit) {
+            props.onCollisionExit(event);
+          }
+        }}
+      >
         {React.cloneElement(props.visibleMesh, {
           ref: meshRef,
           key: 'visible',

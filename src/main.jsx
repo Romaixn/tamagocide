@@ -5,11 +5,11 @@ import Experience from '@/Experience';
 
 import '@/index.css';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isDebug = window.location.hash === '#debug';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Experience />
-    <Leva hidden={isProd} />
+    <Leva hidden={!isDebug} />
   </React.StrictMode>,
 );

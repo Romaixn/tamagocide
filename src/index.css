@@ -190,24 +190,8 @@
     width: 44px;
   }
 
-  .color-danger {
-    color: var(--color-danger);
-  }
-
-  .color-info {
-    color: var(--color-info);
-  }
-
-  .color-warning {
-    color: var(--color-warning);
-  }
-
-  .color-success {
-    color: var(--color-success);
-  }
-
-  .color-default {
-    color: var(--color-default);
+  .container {
+    flex-direction: column;
   }
 
   .meter {

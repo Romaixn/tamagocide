@@ -33,8 +33,8 @@ const HUD = () => {
       },
       details: {
         background: true,
-        title: 'Titre du tuto',
-        content: `Tuto pour les nuls`,
+        title: 'How to play?',
+        content: `TODO`,
       },
       detailsButton: false,
       muteButton: {

@@ -27,6 +27,15 @@ const DraggableRigidBodyProps = {
   resetPositionOnFall: true,
 };
 
+const decreaseStatsOverTime = (decrementStat) => {
+  const intervalId = setInterval(() => {
+    decrementStat('hungry', 5);
+    decrementStat('happy', 5);
+  }, 10000); // Diminution toutes les 10 secondes
+
+  return () => clearInterval(intervalId); // Nettoyage au démontage du composant
+};
+
 export function Pet(props) {
   const { nodes, scene, materials } = useGLTF('/assets/models/pet.glb');
   const wiggleBones = useRef([]);
@@ -51,13 +60,17 @@ export function Pet(props) {
       }
     });
 
+    const cleanupStatsInterval = decreaseStatsOverTime(decrementStat);
+
     return () => {
       wiggleBones.current.forEach((wiggleBone) => {
         wiggleBone.reset();
         wiggleBone.dispose();
       });
+
+      cleanupStatsInterval();
     };
-  }, [nodes]);
+  }, [nodes, decrementStat]);
 
   useFrame(() => {
     wiggleBones.current.forEach((wiggleBone) => {

@@ -8,20 +8,28 @@ export const useStatsStore = create(
       happy: 100,
     },
     incrementStat: (stat, amount) =>
-      set((state) => ({
-        ...state,
-        stats: {
-          ...state.stats,
-          [stat]: state.stats[stat] + amount,
-        },
-      })),
+      set((state) => {
+        const newValue = state.stats[stat] + amount;
+        const clampedValue = stat === 'happy' ? Math.min(newValue, 100) : newValue;
+        return {
+          ...state,
+          stats: {
+            ...state.stats,
+            [stat]: clampedValue,
+          },
+        };
+      }),
     decrementStat: (stat, amount) =>
-      set((state) => ({
-        ...state,
-        stats: {
-          ...state.stats,
-          [stat]: state.stats[stat] - amount,
-        },
-      })),
+      set((state) => {
+        const newValue = state.stats[stat] - amount;
+        const clampedValue = Math.max(newValue, 0);
+        return {
+          ...state,
+          stats: {
+            ...state.stats,
+            [stat]: clampedValue,
+          },
+        };
+      }),
   })),
 );

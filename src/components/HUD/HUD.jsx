@@ -55,7 +55,7 @@ const HUD = () => {
       range: 100,
       width: 100,
       noRange: true,
-      noGradient: true,
+      noGradient: false,
     });
     meterHungry.current.animateIn();
 
@@ -65,7 +65,7 @@ const HUD = () => {
       range: 100,
       width: 100,
       noRange: true,
-      noGradient: true,
+      noGradient: false,
     });
     meterHappiness.current.animateIn();
 

@@ -17,6 +17,7 @@
     "@react-three/postprocessing": "^2.19.1",
     "@react-three/rapier": "^1.5.0",
     "@use-gesture/react": "^10.3.1",
+    "motion": "^12.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "three": "^0.173.0",

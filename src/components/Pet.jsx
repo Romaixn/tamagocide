@@ -6,7 +6,6 @@ import { WiggleBone } from 'wiggle';
 import { useFrame } from '@react-three/fiber';
 import DraggableRigidBody from './controls/DraggableRigidBody';
 import { useState } from 'react';
-import { useRapier } from '@react-three/rapier';
 import { useStatsStore } from '../stores/useStats';
 import { useFoodStore, useToyStore } from '../stores/useProps';
 
@@ -31,9 +30,9 @@ const decreaseStatsOverTime = (decrementStat) => {
   const intervalId = setInterval(() => {
     decrementStat('hungry', 5);
     decrementStat('happy', 5);
-  }, 10000); // Diminution toutes les 10 secondes
+  }, 5000);
 
-  return () => clearInterval(intervalId); // Nettoyage au démontage du composant
+  return () => clearInterval(intervalId);
 };
 
 export function Pet(props) {
@@ -42,6 +41,8 @@ export function Pet(props) {
   const petRigidBodyRef = useRef(null);
   const [isJumping, setIsJumping] = useState(false);
   const [jumpTarget, setJumpTarget] = useState(new THREE.Vector3());
+  const [interactedObjects, setInteractedObjects] = useState(new Set());
+  const interactionCooldown = useRef(new Map());
 
   const incrementStat = useStatsStore((state) => state.incrementStat);
   const decrementStat = useStatsStore((state) => state.decrementStat);
@@ -62,6 +63,8 @@ export function Pet(props) {
 
     const cleanupStatsInterval = decreaseStatsOverTime(decrementStat);
 
+    setInteractedObjects(new Set());
+
     return () => {
       wiggleBones.current.forEach((wiggleBone) => {
         wiggleBone.reset();
@@ -70,7 +73,7 @@ export function Pet(props) {
 
       cleanupStatsInterval();
     };
-  }, [nodes, decrementStat]);
+  }, [nodes, decrementStat, toyItems, foodItems]);
 
   useFrame(() => {
     wiggleBones.current.forEach((wiggleBone) => {
@@ -113,17 +116,48 @@ export function Pet(props) {
 
   const handleCollision = (event) => {
     const collider = event.collider;
+    const objectKey = collider?._parent.userData?.key;
+    if (!objectKey || interactedObjects.has(objectKey)) return;
+
+    if (interactionCooldown.current.has(objectKey)) return;
+
     const toy = collider?._parent.userData?.isToy ?? false;
     const food = collider?._parent.userData?.isFood ?? false;
 
     if (toy) {
-      const toyItem = toyItems.find((item) => item.key === collider._parent.userData.key);
+      const toyItem = toyItems.find((item) => item.key === objectKey);
+      if (!toyItem) return;
+
       removeToy(toyItem.key);
       incrementStat('happy', 10);
+      setInteractedObjects((prev) => new Set(prev).add(objectKey));
+
+      const timeoutId = setTimeout(() => {
+        setInteractedObjects((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(objectKey);
+          return newSet;
+        });
+        interactionCooldown.current.delete(objectKey);
+      }, 500);
+      interactionCooldown.current.set(objectKey, timeoutId);
     } else if (food) {
       const foodItem = foodItems.find((item) => item.key === collider._parent.userData.key);
+      if (!foodItem) return;
+
       removeFood(foodItem.key);
       incrementStat('hungry', 20);
+      setInteractedObjects((prev) => new Set(prev).add(objectKey));
+
+      const timeoutId = setTimeout(() => {
+        setInteractedObjects((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(objectKey);
+          return newSet;
+        });
+        interactionCooldown.current.delete(objectKey);
+      }, 500);
+      interactionCooldown.current.set(objectKey, timeoutId);
     }
   };
 

@@ -5,14 +5,20 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { RigidBody } from '@react-three/rapier';
 import { useToyStore } from '../stores/useProps';
+import { useGame } from '../stores/useGame';
 
 export const Toys = [Duck, Gun, Laptop, Monkey, Radio, Skateboard, Television, VirtualPet];
 
 export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
   const { toyItems, addToy, removeToy } = useToyStore();
+  const phase = useGame((state) => state.phase);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    let intervalId;
+
+    if (phase === 'dead') return;
+
+    intervalId = setInterval(() => {
       const randomToy = Toys[Math.floor(Math.random() * Toys.length)];
 
       const newPosition = new THREE.Vector3(
@@ -36,8 +42,8 @@ export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
       });
     }, spawnInterval);
 
-    return () => clearInterval(intervalId);
-  }, [spawnInterval, spawnAreaSize]);
+    return () => intervalId && clearInterval(intervalId);
+  }, [spawnInterval, spawnAreaSize, phase]);
 
   const handleToyClick = (key) => {
     removeToy(key);

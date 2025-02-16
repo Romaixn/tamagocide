@@ -8,6 +8,7 @@ import DraggableRigidBody from './controls/DraggableRigidBody';
 import { useState } from 'react';
 import { useStatsStore } from '../stores/useStats';
 import { useFoodStore, useToyStore } from '../stores/useProps';
+import { useGame } from '../stores/useGame';
 
 const DraggableRigidBodyProps = {
   rigidBodyProps: {
@@ -49,6 +50,8 @@ export function Pet(props) {
   const { toyItems, removeToy } = useToyStore();
   const { foodItems, removeFood } = useFoodStore();
 
+  const phase = useGame((state) => state.phase);
+
   useEffect(() => {
     wiggleBones.current.length = 0;
     nodes.RootBone.traverse((bone) => {
@@ -85,7 +88,7 @@ export function Pet(props) {
     const rigidBody = petRigidBodyRef.current.getRigidBody();
     if (!rigidBody) return;
 
-    if (!isJumping && rigidBody.isSleeping()) {
+    if (phase !== 'dead' && !isJumping && rigidBody.isSleeping()) {
       if (Math.random() < 0.02) {
         startJump();
       }

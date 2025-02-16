@@ -5,6 +5,7 @@ import { RigidBody } from '@react-three/rapier';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { useFoodStore } from '../stores/useProps';
+import { useGame } from '../stores/useGame';
 
 export const GoodFood = [Apple, Broccoli, Carrot, Eggplant, Ham, Meat, Pineapple, Tomato];
 
@@ -12,9 +13,13 @@ export const BadFood = [Burger, Croissant, Donut, Fries, HotDog, Pizza, Soda, Su
 
 export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
   const { foodItems, addFood, removeFood } = useFoodStore();
+  const phase = useGame((state) => state.phase);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    let intervalId;
+    if (phase === 'dead') return;
+
+    intervalId = setInterval(() => {
       const foodType = Math.random() < 0.5 ? GoodFood : BadFood;
       const randomFood = foodType[Math.floor(Math.random() * foodType.length)];
 
@@ -38,8 +43,8 @@ export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
       });
     }, spawnInterval);
 
-    return () => clearInterval(intervalId);
-  }, [spawnInterval, spawnAreaSize]);
+    return () => intervalId && clearInterval(intervalId);
+  }, [spawnInterval, spawnAreaSize, phase]);
 
   const handleFoodClick = (key) => {
     removeFood(key);

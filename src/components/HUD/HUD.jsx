@@ -34,7 +34,7 @@ const HUD = () => {
       details: {
         background: true,
         title: 'How to play?',
-        content: `TODO`,
+        content: `THIS PROJECT IS STILL A WORK IN PROGRESS.<br><br>Click anywhere to dismiss this message.`,
       },
       detailsButton: false,
       muteButton: {
@@ -94,7 +94,6 @@ const HUD = () => {
     };
 
     window.addEventListener('keydown', handleKeyOrTouchPress);
-    window.addEventListener('click', handleKeyOrTouchPress);
 
     containerRef.current.appendChild(uiInstance.current.element);
     containerRef.current.appendChild(meterHungry.current.element);
@@ -113,7 +112,6 @@ const HUD = () => {
         cancelAnimationFrame(animationFrameRef.current);
       }
       window.removeEventListener('keydown', handleKeyOrTouchPress);
-      window.removeEventListener('click', handleKeyOrTouchPress);
       if (uiInstance.current && uiInstance.current.element && containerRef.current) {
         containerRef.current.removeChild(uiInstance.current.element);
         uiInstance.current = null;

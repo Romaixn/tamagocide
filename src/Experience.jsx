@@ -32,11 +32,7 @@ const Experience = () => {
         <Suspense fallback={null}>{phase !== 'welcome' && <Game />}</Suspense>
       </Canvas>
 
-      {phase !== 'welcome' && (
-        <>
-          <HUD />
-        </>
-      )}
+      {phase !== 'welcome' && <HUD />}
 
       {phase === 'welcome' && <Welcome />}
       {phase === 'dead' && <FinalMessage />}

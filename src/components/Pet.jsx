@@ -52,6 +52,9 @@ export function Pet(props) {
 
   const phase = useGame((state) => state.phase);
 
+  const hungryStat = useStatsStore((state) => state.stats.hungry);
+  const scaleFactor = 0.5 + ((hungryStat - 100) / 100) * 0.05;
+
   useEffect(() => {
     wiggleBones.current.length = 0;
     nodes.RootBone.traverse((bone) => {
@@ -168,7 +171,7 @@ export function Pet(props) {
     <DraggableRigidBody
       {...DraggableRigidBodyProps}
       visibleMesh={
-        <group {...props} dispose={null}>
+        <group {...props} dispose={null} scale={scaleFactor}>
           <skinnedMesh geometry={nodes.Pet.geometry} material={nodes.Pet.material} skeleton={nodes.Pet.skeleton} />
           <primitive object={nodes.RootBone} />
         </group>

@@ -32,7 +32,7 @@ export function Lights() {
         distance={10}
         decay={2}
         color={'#F5F5DC'}
-        shadow-bias={0.001}
+        shadow-bias={-0.001}
         castShadow
       />
     </>

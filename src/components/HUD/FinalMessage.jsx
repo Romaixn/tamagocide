@@ -9,21 +9,21 @@ export const FinalMessage = () => {
   const reasonOfDeath = useStatsStore((state) => state.reasonOfDeath);
 
   useEffect(() => {
-    const messages = generateMessages();
+    const messages = generateMessages(reasonOfDeath);
     setMessageLines(messages);
     setTimeout(() => setIsVisible(true), 500);
-  }, []);
+  }, [reasonOfDeath]);
 
-  const generateMessages = () => {
-    if (reasonOfDeath === 'hungry') {
+  const generateMessages = (reason) => {
+    if (reason === 'hungry') {
       return [
         'TAMAGOTCHI STARVED',
-        "Your Tamagotchi was very hungry and asking for food since 2 hours.",
+        'Your Tamagotchi was very hungry and asking for food since 2 hours.',
         "It's dead now.",
         'Congratulations.',
       ];
     }
-    if (reasonOfDeath === 'happy') {
+    if (reason === 'happy') {
       return [
         'TAMAGOTCHI SAD',
         'Your Tamagotchi died of boredom.',
@@ -31,11 +31,20 @@ export const FinalMessage = () => {
         'Congratulations.',
       ];
     }
-    if (reasonOfDeath === 'overfed') {
+    if (reason === 'overfed') {
       return [
         'TAMAGOTCHI EXPLODED',
         'Your Tamagotchi exploded from eating too much.',
         'You should have rationed it a little...',
+        'Congratulations.',
+      ];
+    }
+
+    if (reason === 'sick') {
+      return [
+        'TAMAGOTCHI SICK',
+        "Your Tamagotchi's arteries are clogged with cheeseburgers and fries.",
+        'It seems a balanced diet was important after all.',
         'Congratulations.',
       ];
     }

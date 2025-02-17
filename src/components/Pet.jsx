@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useStatsStore } from '../stores/useStats';
 import { useFoodStore, useToyStore } from '../stores/useProps';
 import { useGame } from '../stores/useGame';
+import { BadFood } from './Foods';
 
 const DraggableRigidBodyProps = {
   rigidBodyProps: {
@@ -47,6 +48,8 @@ export function Pet(props) {
 
   const incrementStat = useStatsStore((state) => state.incrementStat);
   const decrementStat = useStatsStore((state) => state.decrementStat);
+  const eatBadFood = useStatsStore((state) => state.eatBadFood);
+  const resetConsecutiveBadFoods = useStatsStore((state) => state.resetConsecutiveBadFoods);
   const { toyItems, removeToy } = useToyStore();
   const { foodItems, removeFood } = useFoodStore();
 
@@ -150,6 +153,13 @@ export function Pet(props) {
     } else if (food) {
       const foodItem = foodItems.find((item) => item.key === collider._parent.userData.key);
       if (!foodItem) return;
+
+      const isBadFood = BadFood.includes(foodItem.component);
+      if (isBadFood) {
+        eatBadFood();
+      } else {
+        resetConsecutiveBadFoods();
+      }
 
       removeFood(foodItem.key);
       incrementStat('hungry', 20);

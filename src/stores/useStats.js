@@ -7,6 +7,8 @@ export const useStatsStore = create(
       hungry: 100,
       happy: 100,
     },
+    badFoodsEaten: 0,
+    consecutiveBadFoods: 0,
     isDead: false,
     reasonOfDeath: '',
     incrementStat: (stat, amount) =>
@@ -17,13 +19,12 @@ export const useStatsStore = create(
         const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
-          ...state,
           stats: {
             ...state.stats,
             [stat]: clampedValue,
           },
-          isDead: isDead,
           reasonOfDeath: reasonOfDeath,
+          isDead: isDead,
         };
       }),
     decrementStat: (stat, amount) =>
@@ -34,15 +35,31 @@ export const useStatsStore = create(
         const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
-          ...state,
           stats: {
             ...state.stats,
             [stat]: clampedValue,
           },
-          isDead: isDead,
           reasonOfDeath: reasonOfDeath,
+          isDead: isDead,
         };
       }),
+    eatBadFood: () =>
+      set((state) => {
+        if (state.badFoodsEaten >= 5 || state.consecutiveBadFoods >= 3) {
+          const reasonOfDeath = getReasonOfDeath('sick', state.badFoodsEaten);
+
+          return {
+            reasonOfDeath: reasonOfDeath,
+            isDead: true,
+          };
+        }
+
+        return {
+          badFoodsEaten: state.badFoodsEaten + 1,
+          consecutiveBadFoods: state.consecutiveBadFoods + 1,
+        };
+      }),
+    resetConsecutiveBadFoods: () => set(() => ({ consecutiveBadFoods: 0 })),
   })),
 );
 

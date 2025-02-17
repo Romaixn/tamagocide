@@ -1,5 +1,5 @@
 import React from 'react';
-import { CameraControls, Center, Environment } from '@react-three/drei';
+import { CameraControls, Center, Environment, Sky } from '@react-three/drei';
 import { Bedroom } from './components/Bedroom';
 import { Pet } from './components/Pet';
 import { Perf } from 'r3f-perf';
@@ -7,6 +7,7 @@ import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { FoodSpawner } from './components/Foods';
 import { ToySpawner } from './components/Toys';
+import { Lights } from './Lights';
 
 const isDebug = window.location.hash === '#debug';
 
@@ -29,8 +30,9 @@ export const Game = () => {
     <>
       {isDebug && <Perf position="top-left" />}
 
-      <pointLight position={[5, 5, 5]} />
-      <Environment preset="sunset" />
+      <Environment preset='apartment'  />
+      <Sky sunPosition={[-0.5, 0.2, 0]} />
+      <Lights />
       <CameraControls
         makeDefault
         maxDistance={maxDistance}

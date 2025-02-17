@@ -171,7 +171,7 @@ export function Pet(props) {
     <DraggableRigidBody
       {...DraggableRigidBodyProps}
       visibleMesh={
-        <group {...props} dispose={null} scale={scaleFactor}>
+        <group {...props} dispose={null} scale={scaleFactor} castShadow receiveShadow>
           <skinnedMesh geometry={nodes.Pet.geometry} material={nodes.Pet.material} skeleton={nodes.Pet.skeleton} />
           <primitive object={nodes.RootBone} />
         </group>

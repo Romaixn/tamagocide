@@ -1,5 +1,11 @@
 import React, { useRef } from 'react';
-import { useGLTF } from '@react-three/drei';
+import {
+  Caustics,
+  MeshReflectorMaterial,
+  MeshRefractionMaterial,
+  MeshTransmissionMaterial,
+  useGLTF,
+} from '@react-three/drei';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 
 export function Bedroom(props) {
@@ -182,7 +188,6 @@ export function Bedroom(props) {
       {/* Window */}
       <group position={[0.038, 2.932, 4.276]}>
         <mesh castShadow receiveShadow geometry={nodes.Cube004.geometry} material={materials.Frame} />
-        <mesh castShadow receiveShadow geometry={nodes.Cube004_1.geometry} material={materials.Material} />
       </group>
 
       {/* Cardboard */}

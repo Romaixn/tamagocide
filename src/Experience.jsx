@@ -28,7 +28,8 @@ const Experience = () => {
 
   return (
     <>
-      <Canvas gl={{ antialias: true, stencil: false }}>
+      <Canvas shadows gl={{ antialias: true, stencil: false }}>
+        <color attach="background" args={['#B2EBF2']} />
         <Suspense fallback={null}>{phase !== 'welcome' && <Game />}</Suspense>
       </Canvas>
 

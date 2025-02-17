@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { css } from '../../../styled-system/css';
+import { useStatsStore } from '../../stores/useStats';
 
 export const FinalMessage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [messageLines, setMessageLines] = useState([]);
+  const reasonOfDeath = useStatsStore((state) => state.reasonOfDeath);
 
   useEffect(() => {
     const messages = generateMessages();
@@ -13,6 +15,31 @@ export const FinalMessage = () => {
   }, []);
 
   const generateMessages = () => {
+    if (reasonOfDeath === 'hungry') {
+      return [
+        'TAMAGOTCHI STARVED',
+        "Your Tamagotchi was very hungry and asking for food since 2 hours.",
+        "It's dead now.",
+        'Congratulations.',
+      ];
+    }
+    if (reasonOfDeath === 'happy') {
+      return [
+        'TAMAGOTCHI SAD',
+        'Your Tamagotchi died of boredom.',
+        'It would have liked to play with you a little more.',
+        'Congratulations.',
+      ];
+    }
+    if (reasonOfDeath === 'overfed') {
+      return [
+        'TAMAGOTCHI EXPLODED',
+        'Your Tamagotchi exploded from eating too much.',
+        'You should have rationed it a little...',
+        'Congratulations.',
+      ];
+    }
+
     return ['TAMAGOTCHI DEAD', 'You failed to keep your pet alive.', 'Congratulations.'];
   };
 

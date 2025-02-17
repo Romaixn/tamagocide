@@ -8,11 +8,13 @@ export const useStatsStore = create(
       happy: 100,
     },
     isDead: false,
+    reasonOfDeath: '',
     incrementStat: (stat, amount) =>
       set((state) => {
         const newValue = state.stats[stat] + amount;
         const clampedValue = stat === 'happy' ? Math.min(newValue, 100) : newValue;
         const isDead = clampedValue <= 0 || (stat === 'hungry' && clampedValue >= 200);
+        const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
           ...state,
@@ -21,6 +23,7 @@ export const useStatsStore = create(
             [stat]: clampedValue,
           },
           isDead: isDead,
+          reasonOfDeath: reasonOfDeath,
         };
       }),
     decrementStat: (stat, amount) =>
@@ -28,6 +31,7 @@ export const useStatsStore = create(
         const newValue = state.stats[stat] - amount;
         const clampedValue = Math.max(newValue, 0);
         const isDead = clampedValue <= 0;
+        const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
           ...state,
@@ -36,7 +40,16 @@ export const useStatsStore = create(
             [stat]: clampedValue,
           },
           isDead: isDead,
+          reasonOfDeath: reasonOfDeath,
         };
       }),
   })),
 );
+
+const getReasonOfDeath = (stat, clampedValue) => {
+  if (stat === 'hungry' && clampedValue >= 200) {
+    return 'overfed';
+  }
+
+  return stat;
+};

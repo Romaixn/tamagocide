@@ -8,6 +8,7 @@ import { useControls } from 'leva';
 import { FoodSpawner } from './components/Foods';
 import { ToySpawner } from './components/Toys';
 import { Lights } from './Lights';
+import { Effects } from './Effects';
 
 const isDebug = window.location.hash === '#debug';
 
@@ -49,6 +50,7 @@ export const Game = () => {
           <ToySpawner spawnAreaSize={spawnAreaSize} spawnInterval={toySpawnInterval} />
         </Center>
       </Physics>
+      {/* <Effects /> */}
     </>
   );
 };

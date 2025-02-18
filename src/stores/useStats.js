@@ -9,57 +9,63 @@ export const useStatsStore = create(
     },
     badFoodsEaten: 0,
     consecutiveBadFoods: 0,
-    isDead: false,
-    reasonOfDeath: '',
+    death: null, // { isDead: boolean, reason: string }
     incrementStat: (stat, amount) =>
       set((state) => {
+        if (state.death?.isDead) return { ...state };
+
         const newValue = state.stats[stat] + amount;
         const clampedValue = stat === 'happy' ? Math.min(newValue, 100) : newValue;
         const isDead = clampedValue <= 0 || (stat === 'hungry' && clampedValue >= 200);
-        const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
+        const reason = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
+          ...state,
           stats: {
             ...state.stats,
             [stat]: clampedValue,
           },
-          reasonOfDeath: reasonOfDeath,
-          isDead: isDead,
+          death: isDead ? { isDead: true, reason } : null,
         };
       }),
     decrementStat: (stat, amount) =>
       set((state) => {
+        if (state.death?.isDead) return { ...state };
+
         const newValue = state.stats[stat] - amount;
         const clampedValue = Math.max(newValue, 0);
         const isDead = clampedValue <= 0;
-        const reasonOfDeath = isDead ? getReasonOfDeath(stat, clampedValue) : '';
+        const reason = isDead ? getReasonOfDeath(stat, clampedValue) : '';
 
         return {
+          ...state,
           stats: {
             ...state.stats,
             [stat]: clampedValue,
           },
-          reasonOfDeath: reasonOfDeath,
-          isDead: isDead,
+          death: isDead ? { isDead: true, reason } : null,
         };
       }),
     eatBadFood: () =>
       set((state) => {
         if (state.badFoodsEaten >= 5 || state.consecutiveBadFoods >= 3) {
-          const reasonOfDeath = getReasonOfDeath('sick', state.badFoodsEaten);
+          const reason = getReasonOfDeath('sick', state.badFoodsEaten);
 
           return {
-            reasonOfDeath: reasonOfDeath,
-            isDead: true,
+            ...state,
+            death: { isDead: true, reason },
+            badFoodsEaten: state.badFoodsEaten + 1,
+            consecutiveBadFoods: state.consecutiveBadFoods + 1,
           };
         }
 
         return {
+          ...state,
           badFoodsEaten: state.badFoodsEaten + 1,
           consecutiveBadFoods: state.consecutiveBadFoods + 1,
         };
       }),
-    resetConsecutiveBadFoods: () => set(() => ({ consecutiveBadFoods: 0 })),
+    resetConsecutiveBadFoods: () => set((state) => ({ ...state, consecutiveBadFoods: 0 })),
   })),
 );
 

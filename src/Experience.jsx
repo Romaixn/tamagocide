@@ -11,20 +11,14 @@ import { useEffect } from 'react';
 
 const Experience = () => {
   const dead = useGame((state) => state.dead);
+  const phase = useGame((state) => state.phase);
+  const death = useStatsStore((state) => state.death);
 
   useEffect(() => {
-    const unsubscribeDead = useStatsStore.subscribe(
-      (state) => state.isDead,
-      (isDead) => {
-        if (isDead) {
-          dead();
-        }
-      },
-    );
-
-    return () => unsubscribeDead();
-  }, []);
-  const phase = useGame((state) => state.phase);
+    if (death?.isDead) {
+      dead();
+    }
+  }, [death, dead]);
 
   return (
     <>
@@ -36,7 +30,7 @@ const Experience = () => {
       {phase !== 'welcome' && <HUD />}
 
       {phase === 'welcome' && <Welcome />}
-      {phase === 'dead' && <FinalMessage />}
+      {phase === 'dead' && <FinalMessage death={death} />}
     </>
   );
 };

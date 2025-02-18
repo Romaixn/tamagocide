@@ -82,7 +82,7 @@ export function Pet(props) {
 
       cleanupStatsInterval();
     };
-  }, [nodes, decrementStat, toyItems, foodItems]);
+  }, [nodes, decrementStat, toyItems, foodItems, phase]);
 
   useFrame(() => {
     wiggleBones.current.forEach((wiggleBone) => {

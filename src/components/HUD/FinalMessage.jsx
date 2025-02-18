@@ -1,55 +1,55 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { css } from '../../../styled-system/css';
-import { useStatsStore } from '../../stores/useStats';
 
-export const FinalMessage = () => {
+export const FinalMessage = ({ death }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [messageLines, setMessageLines] = useState([]);
-  const reasonOfDeath = useStatsStore((state) => state.reasonOfDeath);
 
   useEffect(() => {
-    const messages = generateMessages(reasonOfDeath);
-    setMessageLines(messages);
-    setTimeout(() => setIsVisible(true), 500);
-  }, [reasonOfDeath]);
+    if (death && death.isDead) {
+      const messages = generateMessages(death.reason);
+      setMessageLines(messages);
+
+      const timer = setTimeout(() => setIsVisible(true), 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [death]);
 
   const generateMessages = (reason) => {
-    if (reason === 'hungry') {
-      return [
-        'TAMAGOTCHI STARVED',
-        'Your Tamagotchi was very hungry and asking for food since 2 hours.',
-        "It's dead now.",
-        'Congratulations.',
-      ];
+    switch (reason) {
+      case 'hungry':
+        return [
+          'TAMAGOTCHI STARVED',
+          'Your Tamagotchi was very hungry and asking for food since 2 hours.',
+          "It's dead now.",
+          'Congratulations.',
+        ];
+      case 'happy':
+        return [
+          'TAMAGOTCHI SAD',
+          'Your Tamagotchi died of boredom.',
+          'It would have liked to play with you a little more.',
+          'Congratulations.',
+        ];
+      case 'overfed':
+        return [
+          'TAMAGOTCHI EXPLODED',
+          'Your Tamagotchi exploded from eating too much.',
+          'You should have rationed it a little...',
+          'Congratulations.',
+        ];
+      case 'sick':
+        return [
+          'TAMAGOTCHI SICK',
+          "Your Tamagotchi's arteries are clogged with cheeseburgers and fries.",
+          'It seems a balanced diet was important after all.',
+          'Congratulations.',
+        ];
+      default:
+        return ['TAMAGOTCHI DEAD', 'You failed to keep your pet alive.', 'Congratulations.'];
     }
-    if (reason === 'happy') {
-      return [
-        'TAMAGOTCHI SAD',
-        'Your Tamagotchi died of boredom.',
-        'It would have liked to play with you a little more.',
-        'Congratulations.',
-      ];
-    }
-    if (reason === 'overfed') {
-      return [
-        'TAMAGOTCHI EXPLODED',
-        'Your Tamagotchi exploded from eating too much.',
-        'You should have rationed it a little...',
-        'Congratulations.',
-      ];
-    }
-
-    if (reason === 'sick') {
-      return [
-        'TAMAGOTCHI SICK',
-        "Your Tamagotchi's arteries are clogged with cheeseburgers and fries.",
-        'It seems a balanced diet was important after all.',
-        'Congratulations.',
-      ];
-    }
-
-    return ['TAMAGOTCHI DEAD', 'You failed to keep your pet alive.', 'Congratulations.'];
   };
 
   const handleRestart = () => {

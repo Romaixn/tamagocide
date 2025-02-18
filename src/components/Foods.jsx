@@ -20,7 +20,7 @@ export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
     if (phase === 'dead') return;
 
     intervalId = setInterval(() => {
-      const foodType = BadFood;
+      const foodType = Math.random() < 0.5 ? GoodFood : BadFood;
       const randomFood = foodType[Math.floor(Math.random() * foodType.length)];
 
       const newPosition = new THREE.Vector3(

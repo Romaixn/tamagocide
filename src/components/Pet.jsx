@@ -40,6 +40,7 @@ const decreaseStatsOverTime = (decrementStat) => {
 export function Pet(props) {
   const { nodes, scene, materials } = useGLTF('/assets/models/pet.glb');
   const wiggleBones = useRef([]);
+  const bonesAlreadyWiggled = useRef([]);
   const petRigidBodyRef = useRef(null);
   const [isJumping, setIsJumping] = useState(false);
   const [jumpTarget, setJumpTarget] = useState(new THREE.Vector3());
@@ -60,13 +61,16 @@ export function Pet(props) {
 
   useEffect(() => {
     wiggleBones.current.length = 0;
+    bonesAlreadyWiggled.length = 0;
     nodes.RootBone.traverse((bone) => {
       if (bone.isBone && bone !== nodes.RootBone) {
-        const wiggleBone = new WiggleBone(bone, {
-          velocity: 0.2,
-        });
-
-        wiggleBones.current.push(wiggleBone);
+        if (!bonesAlreadyWiggled.current.includes(bone.uuid)) {
+          const wiggleBone = new WiggleBone(bone, {
+            velocity: 0.2,
+          });
+          wiggleBones.current.push(wiggleBone);
+          bonesAlreadyWiggled.current.push(bone.uuid);
+        }
       }
     });
 
@@ -76,13 +80,15 @@ export function Pet(props) {
 
     return () => {
       wiggleBones.current.forEach((wiggleBone) => {
+        console.log(wiggleBone);
+
         wiggleBone.reset();
         wiggleBone.dispose();
       });
 
       cleanupStatsInterval();
     };
-  }, [nodes, decrementStat, toyItems, foodItems, phase]);
+  }, []);
 
   useFrame(() => {
     wiggleBones.current.forEach((wiggleBone) => {
@@ -182,7 +188,9 @@ export function Pet(props) {
       {...DraggableRigidBodyProps}
       visibleMesh={
         <group {...props} dispose={null} scale={scaleFactor} castShadow receiveShadow>
-          <skinnedMesh geometry={nodes.Pet.geometry} material={nodes.Pet.material} skeleton={nodes.Pet.skeleton} />
+          <skinnedMesh geometry={nodes.Pet_1.geometry} material={materials.Body} skeleton={nodes.Pet_1.skeleton} />
+          <skinnedMesh geometry={nodes.Pet_2.geometry} material={materials.White} skeleton={nodes.Pet_2.skeleton} />
+          <skinnedMesh geometry={nodes.Pet_3.geometry} material={materials.Black} skeleton={nodes.Pet_3.skeleton} />
           <primitive object={nodes.RootBone} />
         </group>
       }

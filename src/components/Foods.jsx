@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import { RigidBody } from '@react-three/rapier';
@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useFoodStore } from '../stores/useProps';
 import { useGame } from '../stores/useGame';
+import { useThree } from '@react-three/fiber';
+import useSound from '../stores/useSound';
 
 export const GoodFood = [Apple, Broccoli, Carrot, Eggplant, Ham, Meat, Pineapple, Tomato];
 
@@ -14,6 +16,10 @@ export const BadFood = [Burger, Croissant, Donut, Fries, HotDog, Pizza, Soda, Su
 export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
   const { foodItems, addFood, removeFood } = useFoodStore();
   const phase = useGame((state) => state.phase);
+
+  const soundPlaying = useSound((state) => state.soundPlaying);
+  const popSound = useRef(null);
+  const { camera } = useThree();
 
   useEffect(() => {
     let intervalId;
@@ -43,11 +49,30 @@ export const FoodSpawner = ({ spawnAreaSize, spawnInterval }) => {
       });
     }, spawnInterval);
 
-    return () => intervalId && clearInterval(intervalId);
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    const popAudio = new THREE.Audio(listener);
+    const popLoader = new THREE.AudioLoader();
+    popLoader.load('/assets/sound/pop.mp3', (buffer) => {
+      popAudio.setBuffer(buffer);
+      popAudio.setLoop(false);
+      popAudio.setVolume(0.5);
+      popSound.current = popAudio;
+    });
+
+    return () => {
+      intervalId && clearInterval(intervalId);
+      camera.remove(listener);
+      popAudio.stop();
+    };
   }, [spawnInterval, spawnAreaSize, phase]);
 
   const handleFoodClick = (key) => {
     removeFood(key);
+    if (soundPlaying && popSound.current) {
+      popSound.current.play();
+    }
     document.body.style.cursor = 'auto';
   };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import * as THREE from 'three';
 import { CameraControls, Center, Environment, Sky } from '@react-three/drei';
 import { Bedroom } from './components/Bedroom';
 import { Pet } from './components/Pet';
@@ -9,6 +10,11 @@ import { FoodSpawner } from './components/Foods';
 import { ToySpawner } from './components/Toys';
 import { Lights } from './Lights';
 import { Effects } from './Effects';
+import { useGame } from './stores/useGame';
+import { useThree } from '@react-three/fiber';
+import { useEffect } from 'react';
+import { useRef } from 'react';
+import useSound from './stores/useSound';
 
 const isDebug = window.location.hash === '#debug';
 
@@ -27,11 +33,41 @@ export const Game = () => {
     toySpawnInterval: { value: 25000, min: 1000, max: 60000, step: 1000 },
   });
 
+  const phase = useGame((state) => state.phase);
+  const soundPlaying = useSound((state) => state.soundPlaying);
+  const deathSound = useRef(null);
+  const { camera } = useThree();
+
+  useEffect(() => {
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    const deathAudio = new THREE.Audio(listener);
+    const loader = new THREE.AudioLoader();
+    loader.load('/assets/sound/dead.mp3', (buffer) => {
+      deathAudio.setBuffer(buffer);
+      deathAudio.setLoop(false);
+      deathAudio.setVolume(1);
+      deathSound.current = deathAudio;
+    });
+
+    return () => {
+      deathAudio.stop();
+      camera.remove(listener);
+    };
+  });
+
+  useEffect(() => {
+    if (phase === 'dead' && soundPlaying && deathSound.current) {
+      deathSound.current.play();
+    }
+  }, [phase, soundPlaying]);
+
   return (
     <>
       {isDebug && <Perf position="top-left" />}
 
-      <Environment preset='apartment'  />
+      <Environment preset="apartment" />
       <Sky sunPosition={[-0.5, 0.2, 0]} />
       <Lights />
       <CameraControls

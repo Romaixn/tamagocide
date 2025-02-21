@@ -34,9 +34,21 @@ const HUD = () => {
       details: {
         background: true,
         title: 'How to play?',
-        content: `THIS PROJECT IS STILL A WORK IN PROGRESS.<br><br>Click anywhere to dismiss this message.`,
+        content: `
+        Welcome to Tamagocide! In this game, you're not trying to keep your Tamagotchi alive... you're trying to kill it! 😈
+       <br><br>
+        Here's the gist:
+        <br>
+        <ul>
+    <li><strong>Grab and move</strong>: Pick up your creature and drag it around the screen.</li>
+    <li><strong>Interact with objects</strong>: Click on food, toys, and other items to make them disappear.</li>
+    <li><strong>Experiment and discover</strong>: There are many ways to end your creature's digital life. Overfeed it, neglect it, give it too much fast food... the possibilities are endless! 💀</li>
+    </ul>
+        <br><br>
+        <span style="opacity: var(--ui-secondary-opacity)">Click anywhere to dismiss this message.</span>
+        `,
       },
-      detailsButton: false,
+      detailsButton: true,
       muteButton: {
         sound: soundPlaying,
         callback: () => {
@@ -94,6 +106,7 @@ const HUD = () => {
     };
 
     window.addEventListener('keydown', handleKeyOrTouchPress);
+    window.addEventListener('touchstart', handleKeyOrTouchPress);
 
     containerRef.current.appendChild(uiInstance.current.element);
     containerRef.current.appendChild(meterHungry.current.element);
@@ -102,6 +115,7 @@ const HUD = () => {
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate);
       uiInstance.current?.update();
+      uiInstance.current?.muteButton?.update();
       meterHungry.current?.update();
       meterHappiness.current?.update();
     };

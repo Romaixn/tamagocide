@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei';
 import { useState } from 'react';
@@ -6,12 +6,18 @@ import { useEffect } from 'react';
 import { RigidBody } from '@react-three/rapier';
 import { useToyStore } from '../stores/useProps';
 import { useGame } from '../stores/useGame';
+import useSound from '../stores/useSound';
+import { useThree } from '@react-three/fiber';
 
 export const Toys = [Duck, Gun, Laptop, Monkey, Radio, Skateboard, Television, VirtualPet];
 
 export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
   const { toyItems, addToy, removeToy } = useToyStore();
   const phase = useGame((state) => state.phase);
+
+  const soundPlaying = useSound((state) => state.soundPlaying);
+  const popSound = useRef(null);
+  const { camera } = useThree();
 
   useEffect(() => {
     let intervalId;
@@ -42,11 +48,30 @@ export const ToySpawner = ({ spawnAreaSize, spawnInterval }) => {
       });
     }, spawnInterval);
 
-    return () => intervalId && clearInterval(intervalId);
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    const popAudio = new THREE.Audio(listener);
+    const popLoader = new THREE.AudioLoader();
+    popLoader.load('/assets/sound/pop.mp3', (buffer) => {
+      popAudio.setBuffer(buffer);
+      popAudio.setLoop(false);
+      popAudio.setVolume(0.5);
+      popSound.current = popAudio;
+    });
+
+    return () => {
+      intervalId && clearInterval(intervalId);
+      camera.remove(listener);
+      popAudio.stop();
+    };
   }, [spawnInterval, spawnAreaSize, phase]);
 
   const handleToyClick = (key) => {
     removeToy(key);
+    if (soundPlaying && popSound.current) {
+      popSound.current.play();
+    }
     document.body.style.cursor = 'auto';
   };
 

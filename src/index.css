@@ -190,12 +190,15 @@
     width: 44px;
   }
 
-  .container {
-    flex-direction: column;
-  }
 
   .meter {
     float: right;
     margin: 2rem 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .meter {
+      margin: 1.25rem 0.5rem;
+    }
   }
 }

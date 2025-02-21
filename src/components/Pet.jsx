@@ -3,13 +3,14 @@ import React, { useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useEffect } from 'react';
 import { WiggleBone } from 'wiggle';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import DraggableRigidBody from './controls/DraggableRigidBody';
 import { useState } from 'react';
 import { useStatsStore } from '../stores/useStats';
 import { useFoodStore, useToyStore } from '../stores/useProps';
 import { useGame } from '../stores/useGame';
 import { BadFood } from './Foods';
+import useSound from '../stores/useSound';
 
 const DraggableRigidBodyProps = {
   rigidBodyProps: {
@@ -60,6 +61,10 @@ export function Pet(props) {
   const { foodItems, removeFood } = useFoodStore();
 
   const phase = useGame((state) => state.phase);
+  const soundPlaying = useSound((state) => state.soundPlaying);
+  const jumpSound = useRef(null);
+  const takeSound = useRef(null);
+  const { camera } = useThree();
 
   const scaleFactor = 0.5 + ((hungryStat - 100) / 100) * 0.05;
 
@@ -82,6 +87,27 @@ export function Pet(props) {
 
     setInteractedObjects(new Set());
 
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    const jumpAudio = new THREE.Audio(listener);
+    const jumpLoader = new THREE.AudioLoader();
+    jumpLoader.load('/assets/sound/jump.wav', (buffer) => {
+      jumpAudio.setBuffer(buffer);
+      jumpAudio.setLoop(false);
+      jumpAudio.setVolume(1);
+      jumpSound.current = jumpAudio;
+    });
+
+    const takeAudio = new THREE.Audio(listener);
+    const takeLoader = new THREE.AudioLoader();
+    takeLoader.load('/assets/sound/take.wav', (buffer) => {
+      takeAudio.setBuffer(buffer);
+      takeAudio.setLoop(false);
+      takeAudio.setVolume(1);
+      takeSound.current = takeAudio;
+    });
+
     return () => {
       wiggleBones.current.forEach((wiggleBone) => {
         wiggleBone.reset();
@@ -89,6 +115,11 @@ export function Pet(props) {
       });
 
       cleanupStatsInterval();
+
+      jumpAudio.stop();
+      takeAudio.stop();
+
+      camera.remove(listener);
     };
   }, []);
 
@@ -196,6 +227,10 @@ export function Pet(props) {
   const startJump = (targetPosition = null) => {
     setIsJumping(true);
 
+    if (soundPlaying && jumpSound.current) {
+      jumpSound.current.play();
+    }
+
     if (targetPosition) {
       setJumpTarget(targetPosition);
     } else {
@@ -221,6 +256,12 @@ export function Pet(props) {
 
     const toy = collider?._parent.userData?.isToy ?? false;
     const food = collider?._parent.userData?.isFood ?? false;
+
+    if (toy || food) {
+      if (soundPlaying && takeSound.current) {
+        takeSound.current.play();
+      }
+    }
 
     if (toy) {
       const toyItem = toyItems.find((item) => item.key === objectKey);

@@ -47,6 +47,11 @@ export function Pet(props) {
   const [interactedObjects, setInteractedObjects] = useState(new Set());
   const interactionCooldown = useRef(new Map());
 
+  const hungryStat = useStatsStore((state) => state.stats.hungry);
+  const happyStat = useStatsStore((state) => state.stats.happy);
+  const badFoodsEaten = useStatsStore((state) => state.badFoodsEaten);
+  const consecutiveBadFoods = useStatsStore((state) => state.consecutiveBadFoods);
+
   const incrementStat = useStatsStore((state) => state.incrementStat);
   const decrementStat = useStatsStore((state) => state.decrementStat);
   const eatBadFood = useStatsStore((state) => state.eatBadFood);
@@ -56,7 +61,6 @@ export function Pet(props) {
 
   const phase = useGame((state) => state.phase);
 
-  const hungryStat = useStatsStore((state) => state.stats.hungry);
   const scaleFactor = 0.5 + ((hungryStat - 100) / 100) * 0.05;
 
   useEffect(() => {
@@ -88,21 +92,43 @@ export function Pet(props) {
     };
   }, []);
 
-  const findClosestObject = (objects) => {
+  const findClosestObject = (objects, isFood = false) => {
     let closestObject = null;
     let minDistance = Infinity;
+    let bestScore = -Infinity;
 
     if (!petRigidBodyRef.current) return null;
     const petPosition = petRigidBodyRef.current.getRigidBody().translation();
-
-    const petPositionThree = new THREE.Vector3(petPosition.x, petPosition.y, petPosition.z); // Convertir en THREE.Vector3
+    const petPositionThree = new THREE.Vector3(petPosition.x, petPosition.y, petPosition.z);
 
     objects.forEach((object) => {
       const objectPosition = object.position;
-      const distance = petPositionThree.distanceTo(objectPosition); // Utiliser le THREE.Vector3
+      const distance = petPositionThree.distanceTo(objectPosition);
 
-      if (distance < minDistance) {
-        minDistance = distance;
+      let score = 0;
+
+      if (isFood) {
+        const isBad = BadFood.includes(object.component);
+        if (hungryStat >= 150 && isBad) {
+          score = -distance * 2;
+        } else if (hungryStat < 50) {
+          score = 100 / (distance + 0.1);
+        } else if (hungryStat >= 50 && hungryStat < 100 && !isBad) {
+          score = 50 / (distance + 0.1);
+        } else if (hungryStat >= 100) {
+          score = -distance;
+        }
+      } else {
+        // Toy
+        if (happyStat < 80) {
+          score = 100 / (distance + 0.1);
+        } else {
+          score = 50 / (distance + 0.1);
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
         closestObject = object;
       }
     });
@@ -121,9 +147,36 @@ export function Pet(props) {
     if (!rigidBody) return;
 
     if (phase !== 'dead' && !isJumping && rigidBody.isSleeping()) {
-      const closestFood = findClosestObject(foodItems);
+      const petPosition = petRigidBodyRef.current.getRigidBody().translation();
+      const petPositionThree = new THREE.Vector3(petPosition.x, petPosition.y, petPosition.z);
+      const closestFood = findClosestObject(foodItems, true);
       const closestToy = findClosestObject(toyItems);
-      const closestObject = closestFood || closestToy;
+      let closestObject = null;
+
+      if (closestFood && hungryStat >= 100) {
+        const distanceToFood = petPositionThree.distanceTo(closestFood.position);
+        if (distanceToFood < 1) {
+          const fleeDirection = petPositionThree.clone().sub(closestFood.position).normalize();
+          startJump(petPositionThree.clone().add(fleeDirection));
+          return;
+        }
+      }
+
+      if (hungryStat < 60 && closestFood) {
+        closestObject = closestFood;
+      } else if (happyStat < 70 && closestToy) {
+        closestObject = closestToy;
+      } else if (closestFood && closestToy) {
+        const distanceToFood = petPositionThree.distanceTo(closestFood.position);
+        const distanceToToy = petPositionThree.distanceTo(closestToy.position);
+        if (distanceToFood * 0.7 + Math.random() * 3 < distanceToToy) {
+          closestObject = closestFood;
+        } else {
+          closestObject = closestToy;
+        }
+      } else {
+        closestObject = closestToy;
+      }
 
       if (closestObject) {
         startJump(closestObject.position);
@@ -174,7 +227,7 @@ export function Pet(props) {
       if (!toyItem) return;
 
       removeToy(toyItem.key);
-      incrementStat('happy', 10);
+      incrementStat('happy', 20);
       setInteractedObjects((prev) => new Set(prev).add(objectKey));
 
       const timeoutId = setTimeout(() => {
@@ -186,6 +239,16 @@ export function Pet(props) {
         interactionCooldown.current.delete(objectKey);
       }, 500);
       interactionCooldown.current.set(objectKey, timeoutId);
+
+      // Little happy jump
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          if (phase !== 'dead') {
+            const jumpDirection = new THREE.Vector3(0, 1, 0);
+            petRigidBodyRef.current.getRigidBody().applyImpulse({ x: jumpDirection.x, y: 4, z: jumpDirection.z }, true);
+          }
+        }, i * 800);
+      }
     } else if (food) {
       const foodItem = foodItems.find((item) => item.key === collider._parent.userData.key);
       if (!foodItem) return;

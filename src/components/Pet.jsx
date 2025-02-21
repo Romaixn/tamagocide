@@ -80,8 +80,6 @@ export function Pet(props) {
 
     return () => {
       wiggleBones.current.forEach((wiggleBone) => {
-        console.log(wiggleBone);
-
         wiggleBone.reset();
         wiggleBone.dispose();
       });
@@ -89,6 +87,28 @@ export function Pet(props) {
       cleanupStatsInterval();
     };
   }, []);
+
+  const findClosestObject = (objects) => {
+    let closestObject = null;
+    let minDistance = Infinity;
+
+    if (!petRigidBodyRef.current) return null;
+    const petPosition = petRigidBodyRef.current.getRigidBody().translation();
+
+    const petPositionThree = new THREE.Vector3(petPosition.x, petPosition.y, petPosition.z); // Convertir en THREE.Vector3
+
+    objects.forEach((object) => {
+      const objectPosition = object.position;
+      const distance = petPositionThree.distanceTo(objectPosition); // Utiliser le THREE.Vector3
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestObject = object;
+      }
+    });
+
+    return closestObject;
+  };
 
   useFrame(() => {
     wiggleBones.current.forEach((wiggleBone) => {
@@ -101,7 +121,13 @@ export function Pet(props) {
     if (!rigidBody) return;
 
     if (phase !== 'dead' && !isJumping && rigidBody.isSleeping()) {
-      if (Math.random() < 0.02) {
+      const closestFood = findClosestObject(foodItems);
+      const closestToy = findClosestObject(toyItems);
+      const closestObject = closestFood || closestToy;
+
+      if (closestObject) {
+        startJump(closestObject.position);
+      } else if (Math.random() < 0.02) {
         startJump();
       }
     }
@@ -110,19 +136,23 @@ export function Pet(props) {
       const currentPosition = rigidBody.translation();
       const jumpDirection = jumpTarget.clone().sub(currentPosition).normalize();
 
-      rigidBody.applyImpulse({ x: jumpDirection.x * 4, y: 4, z: jumpDirection.z * 4 }, true);
+      rigidBody.applyImpulse({ x: jumpDirection.x * 5, y: 5, z: jumpDirection.z * 5 }, true);
     }
   });
 
-  const startJump = () => {
+  const startJump = (targetPosition = null) => {
     setIsJumping(true);
 
-    const angle = Math.random() * 2 * Math.PI;
-    const radius = 0.5;
-    const targetX = Math.cos(angle) * radius;
-    const targetZ = Math.sin(angle) * radius;
+    if (targetPosition) {
+      setJumpTarget(targetPosition);
+    } else {
+      const angle = Math.random() * 2 * Math.PI;
+      const radius = 0.5;
+      const targetX = Math.cos(angle) * radius;
+      const targetZ = Math.sin(angle) * radius;
 
-    setJumpTarget(new THREE.Vector3(targetX, 0, targetZ));
+      setJumpTarget(new THREE.Vector3(targetX, 0, targetZ));
+    }
 
     setTimeout(() => {
       setIsJumping(false);

@@ -107,6 +107,8 @@ const HUD = () => {
 
     window.addEventListener('keydown', handleKeyOrTouchPress);
     window.addEventListener('touchstart', handleKeyOrTouchPress);
+    const detailsDom = uiInstance.current.details.element;
+    detailsDom.addEventListener('click', handleKeyOrTouchPress);
 
     containerRef.current.appendChild(uiInstance.current.element);
     containerRef.current.appendChild(meterHungry.current.element);
